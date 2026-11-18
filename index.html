@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#171914" />
+  <title>Folio Atelier · 作品集模板工具</title>
+  <link rel="stylesheet" href="./styles.css?v=17" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a class="app-brand" href="./index.html" aria-label="Folio Atelier 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M7 7h18v18H7z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M11 22V10h10M11 16h7" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+            <circle cx="23.5" cy="8.5" r="2.5" fill="#df5b3d"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>Folio Atelier</strong>
+          <small>作品集工作台</small>
+        </span>
+      </a>
+
+      <div class="save-state" id="save-state" aria-live="polite">
+        <span class="save-dot"></span>
+        <span>已自动保存</span>
+      </div>
+
+      <div class="app-bar-actions">
+        <button class="button button-quiet" type="button" data-action="import-project" title="导入此前的项目 JSON">
+          <span data-icon="upload"></span><span class="button-label">导入项目</span>
+        </button>
+        <button class="button button-quiet" type="button" data-action="export-project" title="下载可继续编辑的项目文件">
+          <span data-icon="download"></span><span class="button-label">导出项目</span>
+        </button>
+        <button class="button button-primary" type="button" data-action="publish-site">
+          <span data-icon="external-link"></span><span>导出发布页</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="studio-main">
+      <nav class="studio-rail" aria-label="编辑模块">
+        <button class="rail-button is-active" type="button" data-panel="profile" aria-label="个人资料" title="个人资料">
+          <span data-icon="user"></span><small>资料</small>
+        </button>
+        <button class="rail-button" type="button" data-panel="modules" aria-label="首页模块" title="首页模块">
+          <span data-icon="layout"></span><small>模块</small>
+        </button>
+        <button class="rail-button" type="button" data-panel="works" aria-label="作品集" title="作品集">
+          <span data-icon="layers"></span><small>作品</small>
+        </button>
+        <button class="rail-button" type="button" data-panel="content" aria-label="页面内容" title="页面内容">
+          <span data-icon="file-text"></span><small>内容</small>
+        </button>
+        <button class="rail-button" type="button" data-panel="theme" aria-label="外观" title="外观">
+          <span data-icon="palette"></span><small>外观</small>
+        </button>
+        <div class="rail-spacer"></div>
+        <button class="rail-button" type="button" data-action="open-help" aria-label="使用说明" title="使用说明">
+          <span data-icon="help"></span><small>说明</small>
+        </button>
+      </nav>
+
+      <aside class="editor-panel" aria-label="编辑面板">
+        <div class="panel-heading">
+          <p class="eyebrow" id="panel-kicker">PROFILE / 01</p>
+          <h1 id="panel-title">个人资料</h1>
+          <p id="panel-description">先建立你的基础信息，再添加作品集与访问密码。</p>
+        </div>
+        <div class="panel-content" id="panel-content"></div>
+        <div class="panel-footer">
+          <span>所有内容保存在此浏览器</span>
+          <button class="text-button" type="button" data-action="reset-project">恢复示例</button>
+        </div>
+      </aside>
+
+      <section class="workspace" aria-label="作品集实时预览">
+        <div class="workspace-toolbar">
+          <div class="segmented-control" aria-label="预览设备">
+            <button class="is-active" type="button" data-viewport="desktop" aria-label="桌面预览" title="桌面预览">
+              <span data-icon="monitor"></span><span>桌面</span>
+            </button>
+            <button type="button" data-viewport="mobile" aria-label="手机预览" title="手机预览">
+              <span data-icon="smartphone"></span><span>手机</span>
+            </button>
+          </div>
+          <div class="preview-note">
+            <span class="live-indicator"></span>
+            <span>实时预览</span>
+            <span class="preview-divider"></span>
+            <span id="preview-summary">4 个作品集 · 1 个加密</span>
+          </div>
+          <button class="icon-button" type="button" data-action="open-preview-page" aria-label="在新窗口预览" title="在新窗口预览">
+            <span data-icon="maximize"></span>
+          </button>
+        </div>
+
+        <div class="preview-stage" id="preview-stage">
+          <div class="preview-browser" id="preview-browser" data-viewport="desktop">
+            <div class="browser-bar" aria-hidden="true">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="browser-address">
+                <span data-icon="lock-small"></span>
+                <span>yourfolio.site</span>
+              </div>
+              <span class="browser-menu">•••</span>
+            </div>
+            <div class="site-preview" id="site-preview"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="album-dialog" id="album-dialog" aria-labelledby="album-dialog-title">
+    <div class="album-dialog-shell">
+      <header class="album-dialog-head">
+        <div>
+          <p class="eyebrow" id="album-dialog-kicker">SELECTED WORK</p>
+          <h2 id="album-dialog-title">作品集标题</h2>
+          <div class="album-variant-tabs" id="album-variant-tabs"></div>
+        </div>
+        <button class="icon-button icon-button-light" type="button" data-action="close-album" aria-label="关闭作品预览">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="album-viewer">
+        <div class="album-viewer-main">
+          <button class="viewer-arrow viewer-arrow-prev" type="button" data-action="previous-image" aria-label="上一张">
+            <span data-icon="arrow-left"></span>
+          </button>
+          <figure>
+            <img id="album-main-image" alt="" />
+            <figcaption id="album-image-caption"></figcaption>
+          </figure>
+          <button class="viewer-arrow viewer-arrow-next" type="button" data-action="next-image" aria-label="下一张">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+        <div class="album-thumbnails" id="album-thumbnails"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="unlock-dialog" id="unlock-dialog" aria-labelledby="unlock-title">
+    <form method="dialog" class="unlock-card" id="unlock-form">
+      <button class="icon-button unlock-close" type="button" data-action="close-unlock" aria-label="关闭密码窗口">
+        <span data-icon="x"></span>
+      </button>
+      <span class="unlock-mark" aria-hidden="true"><span data-icon="lock"></span></span>
+      <p class="eyebrow">PRIVATE COLLECTION</p>
+      <h2 id="unlock-title">此作品集已加密</h2>
+      <p id="unlock-album-name">输入访问密码后查看完整内容。</p>
+      <label class="field">
+        <span>访问密码</span>
+        <span class="password-field">
+          <input id="unlock-password" name="password" type="password" autocomplete="off" maxlength="128" required placeholder="输入作品集密码" />
+          <button type="button" class="field-action" data-action="toggle-unlock-password">显示</button>
+        </span>
+      </label>
+      <p class="form-message" id="unlock-message" role="alert"></p>
+      <button class="button button-primary button-wide" type="submit">
+        <span data-icon="unlock"></span><span>解锁作品集</span>
+      </button>
+      <p class="unlock-note">密码只在当前浏览器会话中用于解锁，不会写入链接。</p>
+    </form>
+  </dialog>
+
+  <dialog class="feature-dialog" id="feature-dialog" aria-labelledby="feature-dialog-title">
+    <article class="feature-sheet">
+      <button class="icon-button icon-button-light feature-close" type="button" data-action="close-feature" aria-label="关闭详情">
+        <span data-icon="x"></span>
+      </button>
+      <p class="eyebrow" id="feature-dialog-kicker">SELECTED PROJECTS</p>
+      <h2 id="feature-dialog-title">模块标题</h2>
+      <p class="feature-intro" id="feature-dialog-description"></p>
+      <div class="feature-detail-body" id="feature-dialog-body"></div>
+      <button class="button button-primary" type="button" data-action="close-feature">返回作品集</button>
+    </article>
+  </dialog>
+
+  <dialog class="crop-dialog" id="crop-dialog" aria-labelledby="crop-title">
+    <div class="crop-sheet">
+      <header class="crop-head">
+        <div>
+          <p class="eyebrow">IMAGE FRAME</p>
+          <h2 id="crop-title">调整图片展示区域</h2>
+          <p id="crop-ratio-label">页面最终显示范围</p>
+        </div>
+        <button class="icon-button" type="button" data-action="cancel-crop" aria-label="关闭图片调整">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="crop-stage" id="crop-stage">
+        <img id="crop-image" alt="调整图片展示区域" />
+        <div class="crop-selection" id="crop-selection">
+          <span class="crop-frame-label">拖动可调</span>
+        </div>
+      </div>
+      <div class="crop-controls">
+        <label class="field crop-zoom-field">
+          <span>图片缩放</span>
+          <span class="range-row">
+            <input type="range" id="crop-zoom" min="1" max="3" step="0.01" value="1" />
+            <output class="range-output" id="crop-zoom-output">100%</output>
+          </span>
+        </label>
+        <button class="text-button" type="button" data-action="reset-crop">恢复居中</button>
+      </div>
+      <div class="crop-actions">
+        <button class="button button-secondary" type="button" data-action="cancel-crop">取消</button>
+        <button class="button button-primary" type="button" data-action="save-crop">应用展示区域</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="image-picker-dialog" id="image-picker-dialog" aria-labelledby="image-picker-title">
+    <div class="image-picker-sheet">
+      <header class="image-picker-head">
+        <div>
+          <p class="eyebrow">UPLOADED ASSETS</p>
+          <h2 id="image-picker-title">选择已上传图片</h2>
+          <p id="image-picker-description">从当前作品集已上传的图片中选择替换项。</p>
+        </div>
+        <button class="icon-button" type="button" data-action="close-image-picker" aria-label="关闭图片选择">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="image-picker-grid" id="image-picker-grid"></div>
+    </div>
+  </dialog>
+
+  <div class="site-hover-preview" id="site-hover-preview" aria-hidden="true"></div>
+
+  <dialog class="help-dialog" id="help-dialog" aria-labelledby="help-title">
+    <div class="help-sheet">
+      <header>
+        <div>
+          <p class="eyebrow">QUICK START</p>
+          <h2 id="help-title">三步完成你的作品集</h2>
+        </div>
+        <button class="icon-button" type="button" data-action="close-help" aria-label="关闭说明">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <ol class="help-steps">
+        <li><b>01</b><div><strong>建立简历横幅</strong><p>填写个人信息，上传背景，并调整模糊度、水印文字和整体配色。</p></div></li>
+        <li><b>02</b><div><strong>设置首页模块</strong><p>主项目与技能入口可以单独编辑，也可以绑定某个作品集作为详情页。</p></div></li>
+        <li><b>03</b><div><strong>添加作品并发布</strong><p>上传主副图与 A+ 后，可拖拽调整封面和分类横幅的展示区域。作品会按类别分组并支持悬停预览。</p></div></li>
+      </ol>
+      <div class="security-note">
+        <span data-icon="shield"></span>
+        <p><strong>关于私密作品</strong> 发布页会对私密作品的原图进行 AES-GCM 加密。纯静态页面仍无法抵御弱密码猜测；正式对外使用或需要访问统计时，建议接入后端鉴权。</p>
+      </div>
+      <button class="button button-dark button-wide" type="button" data-action="close-help">开始编辑</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="progress-overlay" id="progress-overlay" hidden>
+    <div class="progress-card">
+      <span class="progress-spinner" aria-hidden="true"></span>
+      <p id="progress-title">正在打包页面</p>
+      <small id="progress-detail">图片较多时可能需要几秒钟</small>
+    </div>
+  </div>
+
+  <input type="file" id="project-file-input" accept=".json,application/json" hidden />
+  <input type="file" id="asset-file-input" accept="image/*" multiple hidden />
+
+  <script src="./app.js?v=17"></script>
+</body>
+</html>

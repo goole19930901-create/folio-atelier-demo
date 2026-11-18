@@ -1,2 +1,3 @@
-# folio-atelier-demo
-Folio Atelier static demo
+# Folio Atelier Demo
+
+Static browser-only portfolio editor published with GitHub Pages.
